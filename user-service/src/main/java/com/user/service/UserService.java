@@ -4,7 +4,6 @@ import com.user.dto.UserDto;
 import com.user.entity.User;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
 
@@ -12,16 +11,18 @@ public interface UserService {
     User registerUser(UserDto userDTO);
 
     // Get User by ID
-    Optional<User> getUserById(String userId);
+    User getUserById(Long userId);
+
+    String sendVerification(Long userId);
 
     // Get User by Email
-    Optional<User> getUserByEmail(String email);
+    User getUserByEmail(String email);
 
     // Get All Users
     List<User> getAllUsers();
 
     // Update User Profile
-    User updateUserProfile(String userId, UserDto userDTO);
+    User updateUserProfile(Long userId, UserDto userDTO);
 
     // Update Password
     boolean updatePassword(String userId, String oldPassword, String newPassword);
@@ -36,7 +37,7 @@ public interface UserService {
     void verifyEmail(String token);
 
     // Delete User
-    boolean deleteUser(String userId);
+    void deleteUser(Long userId);
 
     // Last Login Update
     void updateLastLogin(String userId);

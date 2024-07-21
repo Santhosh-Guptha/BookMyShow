@@ -36,10 +36,37 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Email is already registered.");
         }
         User user = UserMapper.toEntity(userDTO);
-        user.setStatus(User.Status.ACTIVE);
         user = userRepository.save(user);
 
+//        String verificationCode = UUID.randomUUID().toString();
+//        VerificationToken verificationToken = new VerificationToken();
+//        verificationToken.setUser(user);
+//        verificationToken.setToken(verificationCode);
+//        verificationToken.setExpiryDate(LocalDateTime.now().plusMinutes(5));
+//        tokenRepository.save(verificationToken);
+//
+//        // Create verification URL
+//        //change the URL depending on the controller
+//        String verificationUrl = "http://localhost:8080/api/users/verify?token=" + verificationCode;
+//
+//        // Send verification email
+//        String emailContent = "Please verify your email by clicking the following link: " + verificationUrl;
+//        emailService.sendVerificationEmail(user.getEmail(), "Email Verification", emailContent);
+        return user;
+    }
+
+    @Override
+    public User getUserById(Long userId) {
+        return userRepository.findByUserId(userId)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("User not found with id : " +userId)
+                );
+    }
+
+    @Override
+    public String sendVerification(Long userId) {
         String verificationCode = UUID.randomUUID().toString();
+        User user = getUserById(userId);
         VerificationToken verificationToken = new VerificationToken();
         verificationToken.setUser(user);
         verificationToken.setToken(verificationCode);
@@ -47,32 +74,42 @@ public class UserServiceImpl implements UserService {
         tokenRepository.save(verificationToken);
 
         // Create verification URL
-        String verificationUrl = "http://yourdomain.com/api/users/verify?token=" + verificationCode;
+        //change the URL depending on the controller
+        String verificationUrl = "http://localhost:8080/api/users/verify?token=" + verificationCode;
 
         // Send verification email
         String emailContent = "Please verify your email by clicking the following link: " + verificationUrl;
         emailService.sendVerificationEmail(user.getEmail(), "Email Verification", emailContent);
-        return user;
+        return "Verification code sent successfully";
     }
 
     @Override
-    public Optional<User> getUserById(String userId) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<User> getUserByEmail(String email) {
-        return Optional.empty();
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(
+                () -> new IllegalArgumentException("User not found with email : " + email)
+        );
     }
 
     @Override
     public List<User> getAllUsers() {
-        return List.of();
+        return userRepository.findAll();
     }
 
     @Override
-    public User updateUserProfile(String userId, UserDto userDTO) {
-        return null;
+    public User updateUserProfile(Long userId, UserDto userDto) {
+        User existingUser = getUserById(userId);
+        if (existingUser.getEmail().equals(userDto.getEmail())){
+            existingUser.setEmail(userDto.getEmail());
+        }else {
+            existingUser.setEmail(userDto.getEmail());
+            existingUser.setEmailVerified(Boolean.FALSE);
+        }
+        existingUser.setUpdatedAt(LocalDateTime.now());
+        existingUser.setFirstName(userDto.getFirstName());
+        existingUser.setLastName(userDto.getLastName());
+        existingUser.setPhoneNumber(userDto.getPhoneNumber());
+
+        return userRepository.save(existingUser);
     }
 
     @Override
@@ -102,13 +139,17 @@ public class UserServiceImpl implements UserService {
 
         User user = verificationToken.getUser();
         user.setEmailVerified(true);
+        user.setStatus(User.Status.ACTIVE);
         userRepository.save(user);
         tokenRepository.delete(verificationToken);
     }
 
     @Override
-    public boolean deleteUser(String userId) {
-        return false;
+    public void deleteUser(Long userId) {
+        if (!userRepository.existsById(String.valueOf(userId))) {
+            throw new IllegalArgumentException("User not found with id: " + userId);
+        }
+        userRepository.deleteById(String.valueOf(userId));
     }
 
     @Override
