@@ -5,6 +5,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class EmailService {
     @Autowired
@@ -30,4 +33,5 @@ public class EmailService {
         // Send the email
         javaMailSender.send(message);
     }
+
 }

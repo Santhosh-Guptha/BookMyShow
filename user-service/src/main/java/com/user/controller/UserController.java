@@ -1,6 +1,7 @@
 package com.user.controller;
 
 import com.user.dto.UserDto;
+import com.user.entity.PasswordUpdateRequest;
 import com.user.entity.User;
 import com.user.service.UserService;
 import jakarta.validation.Valid;
@@ -80,5 +81,15 @@ public class UserController {
     @DeleteMapping("/delete/{userId}")
     public void deleteUser(@PathVariable Long userId){
         userService.deleteUser(userId);
+    }
+
+    @PutMapping("/password/{userId}")
+    public String updatePassword(@PathVariable Long userId, @Valid @RequestBody PasswordUpdateRequest passwordUpdateRequest) {
+        return userService.updatePassword(userId, passwordUpdateRequest.getOldPassword(), passwordUpdateRequest.getNewPassword());
+    }
+
+    @PostMapping("/deactivate/{userId}")
+    public String deactivateUserAccount(@PathVariable Long userId) {
+        return userService.deactivateUserAccount(userId);
     }
 }

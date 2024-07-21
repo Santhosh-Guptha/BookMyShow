@@ -25,13 +25,10 @@ public interface UserService {
     User updateUserProfile(Long userId, UserDto userDTO);
 
     // Update Password
-    boolean updatePassword(String userId, String oldPassword, String newPassword);
-
-    // Activate User Account
-    boolean activateUserAccount(String userId);
+    String updatePassword(Long userId, String oldPassword, String newPassword);
 
     // Deactivate User Account
-    boolean deactivateUserAccount(String userId);
+    String deactivateUserAccount(Long userId);
 
     // Verify Email
     void verifyEmail(String token);

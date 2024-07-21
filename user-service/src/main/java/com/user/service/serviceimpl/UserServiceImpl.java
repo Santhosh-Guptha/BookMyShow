@@ -113,18 +113,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean updatePassword(String userId, String oldPassword, String newPassword) {
-        return false;
+    public String updatePassword(Long userId, String oldPassword, String newPassword) {
+        User user = getUserById(userId);
+        if(user.getPassword().equals(oldPassword)){
+            user.setPassword(newPassword);
+            userRepository.save(user);
+            return "Password Updated Successfully";
+        }else {
+            throw new IllegalArgumentException("Old password is incorrect");
+        }
     }
 
     @Override
-    public boolean activateUserAccount(String userId) {
-        return false;
-    }
-
-    @Override
-    public boolean deactivateUserAccount(String userId) {
-        return false;
+    public String deactivateUserAccount(Long userId) {
+        User user = getUserById(userId);
+        user.setStatus(User.Status.INACTIVE);
+        userRepository.save(user);
+        return "User Deactivated successfully";
     }
 
     @Override
@@ -134,7 +139,8 @@ public class UserServiceImpl implements UserService {
         );
 
         if (verificationToken.getExpiryDate().isBefore((LocalDateTime.now()))){
-            throw new RuntimeException("Verification token has expired");
+            tokenRepository.delete(verificationToken);
+            throw new RuntimeException("Verification token has expired,Try send again.");
         }
 
         User user = verificationToken.getUser();
