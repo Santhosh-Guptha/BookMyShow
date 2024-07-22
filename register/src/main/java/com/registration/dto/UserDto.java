@@ -1,23 +1,18 @@
-package com.user.entity;
+package com.registration.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 import java.time.LocalDateTime;
 
-@Data
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "user_details")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Data
+public class UserDto {
+
     private Long userId;
 
     @NotBlank(message = "First name is mandatory")
@@ -34,7 +29,6 @@ public class User {
     @Column(unique = true)
     private String email;
 
-    @JsonIgnore
     @NotBlank(message = "Password is mandatory")
     @Size(min = 8, message = "Password should be at least 8 characters long")
     private String password;
@@ -44,41 +38,11 @@ public class User {
     private String phoneNumber;
 
     @NotNull(message = "Role is mandatory")
-    @Enumerated(EnumType.STRING)
-    @JsonIgnore
-    private Role role;
+    private String role;
 
-    @JsonIgnore
-    @NotNull(message = "Creation date is mandatory")
     private LocalDateTime createdAt;
-
-    @JsonIgnore
-    @NotNull(message = "Update date is mandatory")
     private LocalDateTime updatedAt;
-
-
-    @NotNull(message = "Email verification status is mandatory")
-    private Boolean emailVerified = false;
-
-    @NotNull(message = "Status is mandatory")
-    @Enumerated(EnumType.STRING)
-    private Status status = Status.INACTIVE;
-
-    @JsonIgnore
-    @NotNull(message = "Last login date is mandatory")
+    private Boolean emailVerified;
+    private String status;
     private LocalDateTime lastLogin;
-
-
-    //Enum for Role
-    public enum Role {
-        USER,
-        ADMIN
-    }
-
-    // Enum for Status
-    public enum Status {
-        ACTIVE,
-        INACTIVE,
-        SUSPENDED
-    }
 }
