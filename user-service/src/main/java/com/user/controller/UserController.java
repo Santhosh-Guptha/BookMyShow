@@ -1,7 +1,7 @@
 package com.user.controller;
 
 import com.user.dto.UserDto;
-import com.user.entity.PasswordUpdateRequest;
+import com.user.dto.PasswordUpdateRequest;
 import com.user.entity.User;
 import com.user.service.UserService;
 import jakarta.validation.Valid;
@@ -20,21 +20,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    //required fields for rigistering the user
-//    {
-//        "firstName":"",
-//            "lastName":"",
-//            "email":"",
-//            "password":"",
-//            "phoneNumber":""
-//    }
-    @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@Valid @RequestBody UserDto userDTO) {
-        User user = userService.registerUser(userDTO);
-        return ResponseEntity.ok(user);
-    }
-
 
     @GetMapping("/sendcode/{userId}")
     public ResponseEntity<String> sendVerificationCode(@PathVariable Long userId){

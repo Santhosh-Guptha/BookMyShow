@@ -29,33 +29,6 @@ public class UserServiceImpl implements UserService {
     private VerificationTokenRepository tokenRepository;
 
     @Override
-    public User registerUser(UserDto userDTO) {
-
-        Optional<User> existingUser = userRepository.findByEmail(userDTO.getEmail());
-        if(existingUser.isPresent()){
-            throw new IllegalArgumentException("Email is already registered.");
-        }
-        User user = UserMapper.toEntity(userDTO);
-        user = userRepository.save(user);
-
-//        String verificationCode = UUID.randomUUID().toString();
-//        VerificationToken verificationToken = new VerificationToken();
-//        verificationToken.setUser(user);
-//        verificationToken.setToken(verificationCode);
-//        verificationToken.setExpiryDate(LocalDateTime.now().plusMinutes(5));
-//        tokenRepository.save(verificationToken);
-//
-//        // Create verification URL
-//        //change the URL depending on the controller
-//        String verificationUrl = "http://localhost:8080/api/users/verify?token=" + verificationCode;
-//
-//        // Send verification email
-//        String emailContent = "Please verify your email by clicking the following link: " + verificationUrl;
-//        emailService.sendVerificationEmail(user.getEmail(), "Email Verification", emailContent);
-        return user;
-    }
-
-    @Override
     public User getUserById(Long userId) {
         return userRepository.findByUserId(userId)
                 .orElseThrow(
