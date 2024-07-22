@@ -15,7 +15,7 @@ public class UserMapper {
         user.setEmail(userDto.getEmail());
         user.setPhoneNumber(userDto.getPhoneNumber());
         user.setPassword(userDto.getPassword()); // Note: Password encoding should be handled in the service layer
-        user.setRole(User.Role.USER);
+        user.setRole("USER");
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
         user.setEmailVerified(false);
@@ -31,7 +31,7 @@ public class UserMapper {
         userDTO.setLastName(user.getLastName());
         userDTO.setEmail(user.getEmail());
         userDTO.setPhoneNumber(user.getPhoneNumber());
-        userDTO.setRole(user.getRole().name());
+        userDTO.setRole("USER");
         userDTO.setCreatedAt(user.getCreatedAt());
         userDTO.setUpdatedAt(user.getUpdatedAt());
         userDTO.setEmailVerified(user.getEmailVerified());

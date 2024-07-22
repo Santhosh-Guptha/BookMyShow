@@ -9,6 +9,7 @@ import com.registration.repository.VerificationTokenRepository;
 import com.registration.service.EmailService;
 import com.registration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -28,6 +29,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private VerificationTokenRepository tokenRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public User registerUser(UserDto userDTO) {
 
@@ -36,6 +40,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Email is already registered.");
         }
         User user = UserMapper.toEntity(userDTO);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = userRepository.save(user);
 
         return user;
@@ -53,7 +58,7 @@ public class UserServiceImpl implements UserService {
 
         // Create verification URL
         //change the URL depending on the controller
-        String verificationUrl = "http://localhost:8080/api/users/verify?token=" + verificationCode;
+        String verificationUrl = "http://localhost:8080/api/register/verify?token=" + verificationCode;
 
         // Send verification email
         String emailContent = "Please verify your email by clicking the following link: " + verificationUrl;

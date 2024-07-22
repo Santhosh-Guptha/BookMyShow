@@ -22,7 +22,7 @@ public interface UserService {
     User updateUserProfile(Long userId, UserDto userDTO);
 
     // Update Password
-    String updatePassword(Long userId, String oldPassword, String newPassword);
+    String updatePassword(String email, String oldPassword, String newPassword);
 
     // Deactivate User Account
     String deactivateUserAccount(Long userId);

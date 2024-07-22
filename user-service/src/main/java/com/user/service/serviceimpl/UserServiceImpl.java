@@ -3,17 +3,16 @@ package com.user.service.serviceimpl;
 import com.user.dto.UserDto;
 import com.user.entity.User;
 import com.user.entity.VerificationToken;
-import com.user.mapper.UserMapper;
 import com.user.repository.UserRepository;
 import com.user.repository.VerificationTokenRepository;
 import com.user.service.EmailService;
 import com.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,6 +26,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private VerificationTokenRepository tokenRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public User getUserById(Long userId) {
@@ -86,14 +88,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String updatePassword(Long userId, String oldPassword, String newPassword) {
-        User user = getUserById(userId);
-        if(user.getPassword().equals(oldPassword)){
-            user.setPassword(newPassword);
-            userRepository.save(user);
-            return "Password Updated Successfully";
+    public String updatePassword(String email, String oldPassword, String newPassword) {
+        User user = getUserByEmail(email);
+        if (!passwordEncoder.matches(oldPassword, newPassword)) {
+            return "Password doesn't match";
         }else {
-            throw new IllegalArgumentException("Old password is incorrect");
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return "Password Updated.";
         }
     }
 

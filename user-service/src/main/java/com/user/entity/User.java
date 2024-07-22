@@ -39,6 +39,7 @@ public class User {
     @Size(min = 8, message = "Password should be at least 8 characters long")
     private String password;
 
+    @Column(unique = true)
     @NotBlank(message = "Phone number is mandatory")
     @Pattern(regexp = "\\d{10}", message = "Phone number should be 10 digits")
     private String phoneNumber;

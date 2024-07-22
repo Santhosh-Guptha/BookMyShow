@@ -68,9 +68,9 @@ public class UserController {
         userService.deleteUser(userId);
     }
 
-    @PutMapping("/password/{userId}")
-    public String updatePassword(@PathVariable Long userId, @Valid @RequestBody PasswordUpdateRequest passwordUpdateRequest) {
-        return userService.updatePassword(userId, passwordUpdateRequest.getOldPassword(), passwordUpdateRequest.getNewPassword());
+    @PutMapping("/password/{email}")
+    public String updatePassword(@PathVariable String email, @Valid @RequestBody PasswordUpdateRequest passwordUpdateRequest) {
+        return userService.updatePassword(email, passwordUpdateRequest.getOldPassword(), passwordUpdateRequest.getNewPassword());
     }
 
     @PostMapping("/deactivate/{userId}")

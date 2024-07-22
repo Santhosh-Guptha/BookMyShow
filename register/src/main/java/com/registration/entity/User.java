@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -43,9 +44,8 @@ public class User {
     private String phoneNumber;
 
     @NotNull(message = "Role is mandatory")
-    @Enumerated(EnumType.STRING)
     @JsonIgnore
-    private Role role;
+    private String role;
 
     @JsonIgnore
     @NotNull(message = "Creation date is mandatory")
@@ -66,13 +66,6 @@ public class User {
     @JsonIgnore
     @NotNull(message = "Last login date is mandatory")
     private LocalDateTime lastLogin;
-
-
-    //Enum for Role
-    public enum Role {
-        USER,
-        ADMIN
-    }
 
     // Enum for Status
     public enum Status {
