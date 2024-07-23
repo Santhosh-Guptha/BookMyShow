@@ -41,6 +41,7 @@ public class User {
 
     @NotBlank(message = "Phone number is mandatory")
     @Pattern(regexp = "\\d{10}", message = "Phone number should be 10 digits")
+    @Column(unique = true)
     private String phoneNumber;
 
     @NotNull(message = "Role is mandatory")

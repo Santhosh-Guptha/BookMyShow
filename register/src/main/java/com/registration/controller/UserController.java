@@ -47,9 +47,9 @@ public class UserController {
     }
 
 
-    @GetMapping("/sendcode/{userId}")
-    public ResponseEntity<String> sendVerificationCode(@PathVariable Long userId){
-        return new ResponseEntity<>(userService.sendVerification(userId),HttpStatus.OK);
+    @GetMapping("/sendcode/{email}")
+    public ResponseEntity<String> sendVerificationCode(@PathVariable String email){
+        return new ResponseEntity<>(userService.sendVerification(email),HttpStatus.OK);
     }
 
     @GetMapping("/verify")

@@ -34,11 +34,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User registerUser(UserDto userDTO) {
-
         Optional<User> existingUser = userRepository.findByEmail(userDTO.getEmail());
         if(existingUser.isPresent()){
-            throw new IllegalArgumentException("Email is already registered.");
+            throw new IllegalArgumentException("Email or Phone already registered.");
         }
+
         User user = UserMapper.toEntity(userDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = userRepository.save(user);
@@ -47,9 +47,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String sendVerification(Long userId) {
+    public String sendVerification(String email) {
         String verificationCode = UUID.randomUUID().toString();
-        User user = getUserById(userId);
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new IllegalArgumentException("Email not found, try to register again.")
+        );
         VerificationToken verificationToken = new VerificationToken();
         verificationToken.setUser(user);
         verificationToken.setToken(verificationCode);
@@ -71,24 +73,14 @@ public class UserServiceImpl implements UserService {
         VerificationToken verificationToken = tokenRepository.findByToken(token).orElseThrow(
                 () -> new RuntimeException("Invalid verification token")
         );
-
         if (verificationToken.getExpiryDate().isBefore((LocalDateTime.now()))){
             tokenRepository.delete(verificationToken);
             throw new RuntimeException("Verification token has expired,Try send again.");
         }
-
         User user = verificationToken.getUser();
         user.setEmailVerified(true);
         user.setStatus(User.Status.ACTIVE);
         userRepository.save(user);
         tokenRepository.delete(verificationToken);
     }
-
-    public User getUserById(Long userId) {
-        return userRepository.findByUserId(userId)
-                .orElseThrow(
-                        () -> new IllegalArgumentException("User not found with id : " +userId)
-                );
-    }
-
 }
