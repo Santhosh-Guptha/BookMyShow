@@ -1,5 +1,6 @@
 package com.user.controller;
 
+import com.user.dto.ResetPasswordDto;
 import com.user.dto.UserDto;
 import com.user.dto.PasswordUpdateRequest;
 import com.user.entity.User;
@@ -21,20 +22,20 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-//    @GetMapping("/sendcode/{userId}")
-//    public ResponseEntity<String> sendVerificationCode(@PathVariable Long userId){
-//        return new ResponseEntity<>(userService.sendVerification(userId),HttpStatus.OK);
-//    }
-//
-//    @GetMapping("/verify")
-//    public String verifyEmail(@RequestParam("token") String token) {
-//        try {
-//            userService.verifyEmail(token);
-//            return "Email verified successfully!";
-//        } catch (Exception e) {
-//            return "Failed to verify email: " + e.getMessage();
-//        }
-//    }
+    @GetMapping("/sendcode/{userId}")
+    public ResponseEntity<String> sendVerificationCode(@PathVariable String email,String url){
+        return new ResponseEntity<>(userService.sendVerification(email),HttpStatus.OK);
+    }
+
+    @GetMapping("/verify")
+    public String verifyEmail(@RequestParam("token") String token) {
+        try {
+            userService.verifyEmail(token);
+            return "Email verified successfully!";
+        } catch (Exception e) {
+            return "Failed to verify email: " + e.getMessage();
+        }
+    }
 
     @GetMapping("/id/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable("userId") Long userId){
@@ -80,5 +81,17 @@ public class UserController {
     @PostMapping("/deactivate/{userId}")
     public String deactivateUserAccount(@PathVariable Long userId) {
         return userService.deactivateUserAccount(userId);
+    }
+
+    @PostMapping("/request-password-reset/{email}")
+    public ResponseEntity<String> requestPasswordReset(@PathVariable String email) {
+        userService.sendPasswordReset(email);
+        return ResponseEntity.ok("Password reset email sent successfully");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordDto request) {
+        userService.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok("Password has been reset successfully");
     }
 }

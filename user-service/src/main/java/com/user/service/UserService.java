@@ -10,7 +10,7 @@ public interface UserService {
     // Get User by ID
     User getUserById(Long userId);
 
-    String sendVerification(Long userId);
+    String sendVerification(String email);
 
     // Get User by Email
     User getUserByEmail(String email);
@@ -39,5 +39,10 @@ public interface UserService {
     // Update Account Status
     boolean updateAccountStatus(String userId, User.Status status);
 
+    String sendPasswordReset(String email);
+
+    void resetPassword(String token, String newPassword);
+
+//    void forgotPassword(String email);
 
 }
