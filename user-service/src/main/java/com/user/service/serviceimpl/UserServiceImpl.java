@@ -8,6 +8,7 @@ import com.user.repository.VerificationTokenRepository;
 import com.user.service.EmailService;
 import com.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -39,9 +40,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String sendVerification(Long userId) {
+    public String sendVerification(String email) {
         String verificationCode = UUID.randomUUID().toString();
-        User user = getUserById(userId);
+        User user = getUserByEmail(email);
         VerificationToken verificationToken = new VerificationToken();
         verificationToken.setUser(user);
         verificationToken.setToken(verificationCode);
@@ -50,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
         // Create verification URL
         //change the URL depending on the controller
-        String verificationUrl = "http://localhost:8080/api/users/verify?token=" + verificationCode;
+        String verificationUrl = "http://localhost:8081/api/users/verify?token=" + verificationCode;
 
         // Send verification email
         String emailContent = "Please verify your email by clicking the following link: " + verificationUrl;
@@ -141,5 +142,41 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean updateAccountStatus(String userId, User.Status status) {
         return false;
+    }
+
+    @Override
+    public String sendPasswordReset(String email) {
+        String resetToken = UUID.randomUUID().toString();
+        User user = getUserByEmail(email);
+        VerificationToken verificationToken = new VerificationToken();
+        verificationToken.setUser(user);
+        verificationToken.setToken(resetToken);
+        verificationToken.setExpiryDate(LocalDateTime.now().plusMinutes(5));
+        tokenRepository.save(verificationToken);
+
+        // Create password reset URL
+        String resetUrl = "http://localhost:8081/api/users/reset-password?token=" + resetToken;
+
+        // Send password reset email
+        String emailContent = "To reset your password, please click the following link: " + resetUrl;
+        emailService.sendVerificationEmail(user.getEmail(), "Password Reset Request", emailContent);
+        return "Password reset email sent successfully";
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        VerificationToken verificationToken = tokenRepository.findByToken(token).orElseThrow(
+                () -> new RuntimeException("Invalid reset token")
+        );
+
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            tokenRepository.delete(verificationToken);
+            throw new RuntimeException("Reset token has expired. Please request a new one.");
+        }
+
+        User user = verificationToken.getUser();
+        user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+        userRepository.save(user);
+        tokenRepository.delete(verificationToken);
     }
 }
