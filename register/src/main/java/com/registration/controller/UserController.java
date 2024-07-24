@@ -3,6 +3,8 @@ package com.registration.controller;
 import com.registration.dto.UserDto;
 import com.registration.dto.UserLogin;
 import com.registration.entity.User;
+import com.registration.exception.EmailNotFoundException;
+import com.registration.repository.UserRepository;
 import com.registration.service.JwtService;
 import com.registration.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +36,9 @@ public class UserController {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     //required fields for registering the user
 //    {
@@ -101,12 +106,20 @@ public class UserController {
     @PostMapping("/login")
     public String login(@RequestBody UserLogin request){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword()));
-        if(authentication.isAuthenticated()){
-            String result = jwtService.generateToken();
-            return result;
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+                ()-> new EmailNotFoundException("Email not registered")
+        );
+        if(user.getEmailVerified().equals(true)){
+            if(authentication.isAuthenticated()){
+                String result = jwtService.generateToken();
+                return result;
+            }else {
+                throw new UsernameNotFoundException("Invalid Username or Password");
+            }
         }else {
-            throw new UsernameNotFoundException("Invalid Username or Password");
+            return "Please verify you email.";
         }
+
     }
 
 }
