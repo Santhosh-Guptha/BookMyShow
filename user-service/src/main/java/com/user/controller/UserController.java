@@ -21,20 +21,20 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/sendcode/{userId}")
-    public ResponseEntity<String> sendVerificationCode(@PathVariable Long userId){
-        return new ResponseEntity<>(userService.sendVerification(userId),HttpStatus.OK);
-    }
-
-    @GetMapping("/verify")
-    public String verifyEmail(@RequestParam("token") String token) {
-        try {
-            userService.verifyEmail(token);
-            return "Email verified successfully!";
-        } catch (Exception e) {
-            return "Failed to verify email: " + e.getMessage();
-        }
-    }
+//    @GetMapping("/sendcode/{userId}")
+//    public ResponseEntity<String> sendVerificationCode(@PathVariable Long userId){
+//        return new ResponseEntity<>(userService.sendVerification(userId),HttpStatus.OK);
+//    }
+//
+//    @GetMapping("/verify")
+//    public String verifyEmail(@RequestParam("token") String token) {
+//        try {
+//            userService.verifyEmail(token);
+//            return "Email verified successfully!";
+//        } catch (Exception e) {
+//            return "Failed to verify email: " + e.getMessage();
+//        }
+//    }
 
     @GetMapping("/id/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable("userId") Long userId){
@@ -64,8 +64,12 @@ public class UserController {
     }
 
     @DeleteMapping("/delete/{userId}")
-    public void deleteUser(@PathVariable Long userId){
+    public ResponseEntity<String> delete(@PathVariable long userId)
+
+    {
+
         userService.deleteUser(userId);
+        return new ResponseEntity<String>("data deleted successfully  :" + userId,HttpStatus.OK);
     }
 
     @PutMapping("/password/{email}")

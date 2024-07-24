@@ -5,6 +5,9 @@ import com.registration.dto.UserLogin;
 import com.registration.entity.User;
 import com.registration.service.JwtService;
 import com.registration.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,18 @@ public class UserController {
 //            "password":"",
 //            "phoneNumber":""
 //    }
+
+
+
+
+
+
+
+    @Operation(summary = "User Registration", description = "This API will helps the user to register.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User registered successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input")
+    })
     @PostMapping
     public ResponseEntity<User> registerUser(@Valid @RequestBody UserDto userDTO) {
         User user = userService.registerUser(userDTO);
@@ -47,11 +62,25 @@ public class UserController {
     }
 
 
+
+    @Operation(summary = "Send verification code", description = "Sends a verification code to the user's email")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Verification code sent successfully"),
+            @ApiResponse(responseCode = "404", description = "Email not found")
+    })
     @GetMapping("/sendcode/{email}")
     public ResponseEntity<String> sendVerificationCode(@PathVariable String email){
         return new ResponseEntity<>(userService.sendVerification(email),HttpStatus.OK);
     }
 
+
+
+
+    @Operation(summary = "Verify email", description = "Verifies the user's email with the provided token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Email verified successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid token")
+    })
     @GetMapping("/verify")
     public String verifyEmail(@RequestParam("token") String token) {
         try {
@@ -62,6 +91,13 @@ public class UserController {
         }
     }
 
+
+
+    @Operation(summary = "User login", description = "Authenticates the user and returns a JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login successful, JWT token returned"),
+            @ApiResponse(responseCode = "401", description = "Invalid username or password")
+    })
     @PostMapping("/login")
     public String login(@RequestBody UserLogin request){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword()));
