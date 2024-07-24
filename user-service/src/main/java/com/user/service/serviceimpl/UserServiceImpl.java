@@ -72,40 +72,56 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUserProfile(Long userId, UserDto userDto) {
-        User existingUser = getUserById(userId);
-        if (existingUser.getEmail().equals(userDto.getEmail())){
-            existingUser.setEmail(userDto.getEmail());
+    public String updateUserProfile(String email, UserDto userDto) {
+        User existingUser = getUserByEmail(email);
+        if(existingUser.getStatus().equals(User.Status.INACTIVE)){
+            return "User Not allowed to update the details.";
         }else {
-            existingUser.setEmail(userDto.getEmail());
-            existingUser.setEmailVerified(Boolean.FALSE);
+            if (existingUser.getEmail().equals(userDto.getEmail())) {
+                existingUser.setEmail(userDto.getEmail());
+            } else {
+                existingUser.setEmail(userDto.getEmail());
+                existingUser.setEmailVerified(Boolean.FALSE);
+            }
+            existingUser.setUpdatedAt(LocalDateTime.now());
+            existingUser.setFirstName(userDto.getFirstName());
+            existingUser.setLastName(userDto.getLastName());
+            existingUser.setPhoneNumber(userDto.getPhoneNumber());
+            userRepository.save(existingUser);
+            return "User Updated successfully.";
         }
-        existingUser.setUpdatedAt(LocalDateTime.now());
-        existingUser.setFirstName(userDto.getFirstName());
-        existingUser.setLastName(userDto.getLastName());
-        existingUser.setPhoneNumber(userDto.getPhoneNumber());
-
-        return userRepository.save(existingUser);
     }
 
     @Override
     public String updatePassword(String email, String oldPassword, String newPassword) {
         User user = getUserByEmail(email);
-        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            return "Password doesn't match";
+        if (user.getStatus().equals(User.Status.INACTIVE)) {
+            return "User not allowed to update password.";
         }else {
-            user.setPassword(passwordEncoder.encode(newPassword));
-            userRepository.save(user);
-            return "Password Updated.";
+            if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+                return "Password doesn't match";
+            } else {
+                user.setPassword(passwordEncoder.encode(newPassword));
+                userRepository.save(user);
+                return "Password Updated.";
+            }
         }
     }
 
     @Override
-    public String deactivateUserAccount(Long userId) {
-        User user = getUserById(userId);
+    public String deactivateUserAccount(String email) {
+        User user = getUserByEmail(email);
         user.setStatus(User.Status.INACTIVE);
         userRepository.save(user);
         return "User Deactivated successfully";
+    }
+
+    @Override
+    public String activateUserAccount(String email){
+        User user = getUserByEmail(email);
+        user.setStatus(User.Status.ACTIVE);
+        userRepository.save(user);
+        return "User Activated successfully";
     }
 
     @Override
@@ -127,11 +143,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Long userId) {
-        if (!userRepository.existsById(String.valueOf(userId))) {
-            throw new IllegalArgumentException("User not found with id: " + userId);
+    public void deleteUser(String email) {
+        if (!userRepository.existsById(String.valueOf(email))) {
+            throw new IllegalArgumentException("User not found with id: " + email);
         }
-        userRepository.deleteById(String.valueOf(userId));
+        userRepository.deleteById(email);
     }
 
     @Override

@@ -19,19 +19,21 @@ public interface UserService {
     List<User> getAllUsers();
 
     // Update User Profile
-    User updateUserProfile(Long userId, UserDto userDTO);
+    String updateUserProfile(String email, UserDto userDTO);
 
     // Update Password
     String updatePassword(String email, String oldPassword, String newPassword);
 
     // Deactivate User Account
-    String deactivateUserAccount(Long userId);
+    String deactivateUserAccount(String email);
+
+    String activateUserAccount(String email);
 
     // Verify Email
     void verifyEmail(String token);
 
     // Delete User
-    void deleteUser(Long userId);
+    void deleteUser(String email);
 
     // Last Login Update
     void updateLastLogin(String userId);

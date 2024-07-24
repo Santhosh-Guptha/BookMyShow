@@ -48,13 +48,6 @@ public class UserController {
 //            "password":"",
 //            "phoneNumber":""
 //    }
-
-
-
-
-
-
-
     @Operation(summary = "User Registration", description = "This API will helps the user to register.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User registered successfully"),

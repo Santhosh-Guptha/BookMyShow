@@ -41,9 +41,6 @@ public class UserController {
     }
 
 
-
-
-
     @Operation(summary = "Get user by ID", description = "Returns a user by their ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User found"),
@@ -53,7 +50,6 @@ public class UserController {
     public ResponseEntity<User> getUserById(@PathVariable("userId") Long userId){
         return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
     }
-
 
 
     @Operation(summary = "Get user by email", description = "Returns a user by their email")
@@ -67,7 +63,6 @@ public class UserController {
     }
 
 
-
     @Operation(summary = "Get all users", description = "Returns a list of all users")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of users retrieved")
@@ -77,6 +72,7 @@ public class UserController {
         return new ResponseEntity<>(userService.getAllUsers(),HttpStatus.OK);
     }
 
+
     //required fields to update
 //    {
 //        "firstName":"",
@@ -84,20 +80,16 @@ public class UserController {
 //            "phoneNumber":"",
 //            "email":""
 //    }
-
-
-
     @Operation(summary = "Update user", description = "Updates the details of a user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User updated successfully"),
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    @PutMapping("/update/{userId}")
-    public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody UserDto userDto){
-        return new ResponseEntity<>(userService.updateUserProfile(userId, userDto),HttpStatus.OK);
+    @PutMapping("/update/{email}")
+    public ResponseEntity<String> updateUser(@PathVariable String email, @RequestBody UserDto userDto){
+        return new ResponseEntity<>(userService.updateUserProfile(email, userDto),HttpStatus.OK);
     }
-
 
 
     @Operation(summary = "Delete user", description = "Deletes a user by their ID")
@@ -105,15 +97,11 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User deleted successfully"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
-    @DeleteMapping("/delete/{userId}")
-    public ResponseEntity<String> delete(@PathVariable long userId)
-
-    {
-
-        userService.deleteUser(userId);
-        return new ResponseEntity<String>("data deleted successfully  :" + userId,HttpStatus.OK);
+    @DeleteMapping("/delete/{email}")
+    public ResponseEntity<String> delete(@PathVariable String email) {
+        userService.deleteUser(email);
+        return new ResponseEntity<String>("data deleted successfully  :" + email,HttpStatus.OK);
     }
-
 
 
     @Operation(summary = "Update password", description = "Updates the password of a user")
@@ -133,9 +121,14 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User account deactivated successfully"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
-    @PostMapping("/deactivate/{userId}")
-    public String deactivateUserAccount(@PathVariable Long userId) {
-        return userService.deactivateUserAccount(userId);
+    @PostMapping("/deactivate/{email}")
+    public String deactivateUserAccount(@PathVariable String email) {
+        return userService.deactivateUserAccount(email);
+    }
+
+    @PostMapping("/activate/{email}")
+    public String activateUserAccount(@PathVariable String email) {
+        return userService.activateUserAccount(email);
     }
 
     @PostMapping("/request-password-reset/{email}")
@@ -143,6 +136,7 @@ public class UserController {
         userService.sendPasswordReset(email);
         return ResponseEntity.ok("Password reset email sent successfully");
     }
+
 
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordDto request) {
