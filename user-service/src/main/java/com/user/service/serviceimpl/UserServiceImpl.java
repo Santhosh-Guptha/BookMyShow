@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String updatePassword(String email, String oldPassword, String newPassword) {
         User user = getUserByEmail(email);
-        if (!passwordEncoder.matches(oldPassword, newPassword)) {
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             return "Password doesn't match";
         }else {
             user.setPassword(passwordEncoder.encode(newPassword));
